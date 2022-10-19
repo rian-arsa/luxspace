@@ -1,6 +1,37 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 function Details() {
+  const [selected, setSelected] = useState("");
+  const [product, setProduct] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const { id } = useParams();
+
+  useEffect(() => {
+    getProduct();
+  }, []);
+
+  const onSelected = (image) => {
+    setSelected(image);
+  };
+
+  const getProduct = async () => {
+    await axios
+      .get(
+        `https://3e74b340-7fd3-4f6f-b5d6-72ed4ed77871.mock.pstmn.io/api/products/${id}`
+      )
+      .then((res) => {
+        setProduct(res.data);
+        setLoading(true);
+        setSelected(res.data.imgUrls[0]);
+      })
+      .catch((err) => {
+        console.error(err.message);
+      });
+  };
+
   return (
     <section className="container mx-auto">
       <div className="flex flex-wrap my-4 md:my-12">
@@ -11,71 +42,33 @@ function Details() {
         <div className="flex-1">
           <div className="slider">
             <div className="thumbnail">
-              <div className="px-2">
-                <div
-                  className="item selected"
-                  data-img="/images/content/showcase-1.front.jpg"
-                >
-                  <img
-                    src="/images/content/showcase-1.front.jpg"
-                    alt="front"
-                    className="object-cover w-full h-full rounded-lg"
-                  />
-                </div>
-              </div>
-              <div className="px-2">
-                <div
-                  className="item"
-                  data-img="/images/content/showcase-1.back.jpg"
-                >
-                  <img
-                    src="/images/content/showcase-1.back.jpg"
-                    alt="back"
-                    className="object-cover w-full h-full rounded-lg"
-                  />
-                </div>
-              </div>
-              <div className="px-2">
-                <div
-                  className="item"
-                  data-img="/images/content/showcase-1.rear.jpg"
-                >
-                  <img
-                    src="/images/content/showcase-1.rear.jpg"
-                    alt="rear"
-                    className="object-cover w-full h-full rounded-lg"
-                  />
-                </div>
-              </div>
-              <div className="px-2">
-                <div
-                  className="item"
-                  data-img="/images/content/showcase-1.side.jpg"
-                >
-                  <img
-                    src="/images/content/showcase-1.side.jpg"
-                    alt="side"
-                    className="object-cover w-full h-full rounded-lg"
-                  />
-                </div>
-              </div>
-              <div className="px-2">
-                <div
-                  className="item"
-                  data-img="/images/content/showcase-1.top.jpg"
-                >
-                  <img
-                    src="/images/content/showcase-1.top.jpg"
-                    alt="top"
-                    className="object-cover w-full h-full rounded-lg"
-                  />
-                </div>
-              </div>
+              {loading
+                ? product.imgUrls.map((image) => (
+                    <div
+                      className="px-2"
+                      key={image}
+                      onClick={() => onSelected(image)}
+                    >
+                      <div
+                        className={`item ${image === selected && "selected"}`}
+                        data-img={image}
+                      >
+                        <img
+                          src={image}
+                          alt="back"
+                          className="object-cover w-full h-full rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  ))
+                : ""}
             </div>
             <div className="preview">
               <div className="item rounded-lg h-full overflow-hidden">
                 <img
-                  src="/images/content/showcase-1.front.jpg"
+                  src={
+                    loading ? (selected ? selected : product.imgUrls[0]) : ""
+                  }
                   alt="front"
                   className="object-cover w-full h-full rounded-lg"
                 />
@@ -84,8 +77,8 @@ function Details() {
           </div>
         </div>
         <div className="flex-1 px-4 md:p-6">
-          <h2 className="text-5xl font-semibold">Chair Thatty</h2>
-          <p className="text-xl">IDR 12.000.000</p>
+          <h2 className="text-5xl font-semibold">{product.title}</h2>
+          <p className="text-xl">IDR {product.price}</p>
 
           <a
             href="cart.html"

@@ -1,9 +1,34 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import getCheckout from "../../helpers/fetch/getCheckout";
 
 function CompleteYourRoom() {
+  const [couriers, setCouriers] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getCheckout();
+  }, []);
+
+  const getCheckout = async () => {
+    await axios
+      .get(
+        `https://3e74b340-7fd3-4f6f-b5d6-72ed4ed77871.mock.pstmn.io/api/checkout/meta`
+      )
+      .then((res) => {
+        setCouriers(res.data.couriers);
+        setPayments(res.data.payments);
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
   return (
     <section className="md:py-16">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 mt-10">
         <div className="flex -mx-4 flex-wrap">
           <div
             className="w-full px-4 mb-4 md:w-8/12 md:mb-0"
@@ -230,34 +255,24 @@ function CompleteYourRoom() {
                     Choose Courier
                   </label>
                   <div className="flex -mx-2 flex-wrap">
-                    <div className="px-2 w-6/12 h-24 mb-4">
-                      <button
-                        type="button"
-                        data-value="fedex"
-                        data-name="courier"
-                        className="border border-gray-200 focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full focus:outline-none"
-                      >
-                        <img
-                          src="./images/content/logo-fedex.svg"
-                          alt="Logo Fedex"
-                          className="object-contain max-h-full"
-                        />
-                      </button>
-                    </div>
-                    <div className="px-2 w-6/12 h-24 mb-4">
-                      <button
-                        type="button"
-                        data-value="dhl"
-                        data-name="courier"
-                        className="border border-gray-200 focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full focus:outline-none"
-                      >
-                        <img
-                          src="./images/content/logo-dhl.svg"
-                          alt="Logo dhl"
-                          className="object-contain max-h-full"
-                        />
-                      </button>
-                    </div>
+                    {couriers
+                      ? couriers.map((data) => (
+                          <div className="px-2 w-6/12 h-24 mb-4">
+                            <button
+                              type="button"
+                              data-value="fedex"
+                              data-name="courier"
+                              className="border border-gray-200 focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full focus:outline-none"
+                            >
+                              <img
+                                src={data.imgUrl}
+                                alt={data.name}
+                                className="object-contain max-h-full"
+                              />
+                            </button>
+                          </div>
+                        ))
+                      : ""}
                   </div>
                 </div>
 
@@ -266,60 +281,24 @@ function CompleteYourRoom() {
                     Choose Payment
                   </label>
                   <div className="flex -mx-2 flex-wrap">
-                    <div className="px-2 w-6/12 h-24 mb-4">
-                      <button
-                        type="button"
-                        data-value="midtrans"
-                        data-name="payment"
-                        className="border border-gray-200 focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full focus:outline-none"
-                      >
-                        <img
-                          src="./images/content/logo-midtrans.png"
-                          alt="Logo midtrans"
-                          className="object-contain max-h-full"
-                        />
-                      </button>
-                    </div>
-                    <div className="px-2 w-6/12 h-24 mb-4">
-                      <button
-                        type="button"
-                        data-value="mastercard"
-                        data-name="payment"
-                        className="border border-gray-200 focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full focus:outline-none"
-                      >
-                        <img
-                          src="./images/content/logo-mastercard.svg"
-                          alt="Logo mastercard"
-                        />
-                      </button>
-                    </div>
-                    <div className="px-2 w-6/12 h-24 mb-4">
-                      <button
-                        type="button"
-                        data-value="bitcoin"
-                        data-name="payment"
-                        className="border border-gray-200 focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full focus:outline-none"
-                      >
-                        <img
-                          src="./images/content/logo-bitcoin.svg"
-                          alt="Logo bitcoin"
-                          className="object-contain max-h-full"
-                        />
-                      </button>
-                    </div>
-                    <div className="px-2 w-6/12 h-24 mb-4">
-                      <button
-                        type="button"
-                        data-value="american-express"
-                        data-name="payment"
-                        className="border border-gray-200 focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full focus:outline-none"
-                      >
-                        <img
-                          src="./images/content/logo-american-express.svg"
-                          alt="Logo american-logo-american-express"
-                        />
-                      </button>
-                    </div>
+                    {payments
+                      ? payments.map((data) => (
+                          <div className="px-2 w-6/12 h-24 mb-4">
+                            <button
+                              type="button"
+                              data-value="midtrans"
+                              data-name="payment"
+                              className="border border-gray-200 focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full focus:outline-none"
+                            >
+                              <img
+                                src={data.imgUrl}
+                                alt={data.name}
+                                className="object-contain max-h-full"
+                              />
+                            </button>
+                          </div>
+                        ))
+                      : ""}
                   </div>
                 </div>
                 <div className="text-center">
